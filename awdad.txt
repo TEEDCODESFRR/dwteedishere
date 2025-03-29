@@ -1,0 +1,36 @@
+-- Place this in a LocalScript inside StarterPlayer -> StarterPlayerScripts
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local userInputService = game:GetService("UserInputService")
+
+-- Constants for fling force
+local forwardForce = 100
+local upwardForce = 10
+local backwardForce = -100
+
+-- Function to apply force
+local function applyFling(forwardDirection, upwardDirection)
+    -- Create BodyVelocity for applying the fling
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(500000, 500000, 500000)  -- Max force for the fling
+    bodyVelocity.Velocity = humanoidRootPart.CFrame.LookVector * forwardDirection + Vector3.new(0, upwardDirection, 0)
+    bodyVelocity.Parent = humanoidRootPart
+
+    -- Remove the BodyVelocity after a short time to stop the force application
+    game.Debris:AddItem(bodyVelocity, 0.1)
+end
+
+-- Listen for the E and Q key press
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end  -- Ignore if the input is already processed
+
+    if input.KeyCode == Enum.KeyCode.E then
+        -- Flings forward (100 studs) and upward (10 studs)
+        applyFling(forwardForce, upwardForce)
+    elseif input.KeyCode == Enum.KeyCode.Q then
+        -- Flings backward (-100 studs) and upward (10 studs)
+        applyFling(backwardForce, upwardForce)
+    end
+end)
